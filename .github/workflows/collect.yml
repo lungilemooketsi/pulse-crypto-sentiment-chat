@@ -1,0 +1,89 @@
+name: Collect
+
+# Runs the data collectors every 3 hours and commits the dated files to the `data` branch.
+# GitHub can delay or drop scheduled runs, so a second schedule covers the gaps. Repeat posts are skipped.
+# Bluesky returns only its latest posts, so collecting more often than daily keeps gaps small.
+# A failed source fails the run (GitHub emails the repository owner) after the other sources are saved.
+on:
+  schedule:
+    - cron: "17 */3 * * *"
+    - cron: "47 1,7,13,19 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write  # to start a deploy with the new snapshot
+
+concurrency:
+  group: collect
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check out the data branch into data/
+        run: |
+          if git ls-remote --exit-code --heads origin data >/dev/null; then
+            git fetch --depth=1 origin data
+            git worktree add -B data data origin/data
+          else
+            git worktree add --orphan -b data data
+          fi
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run the collectors
+        id: collect
+        working-directory: pipeline
+        run: |
+          set +e
+          python -m pulse_pipeline.collect --out ../data/raw
+          echo "status=$?" >> "$GITHUB_OUTPUT"
+        env:
+          ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API }}
+          ARKHAM_API_KEY: ${{ secrets.ARKHAM_API }}
+          PULSE_USER_AGENT: ${{ vars.PULSE_USER_AGENT }}
+
+      # If this step fails, the snapshot falls back to Muse Spark's labels.
+      - name: Label posts with Pulse's own model
+        continue-on-error: true
+        working-directory: pipeline
+        run: |
+          gh release download sentiment-model-v1 --pattern sentiment-model.tar.gz --dir "$RUNNER_TEMP"
+          mkdir -p "$RUNNER_TEMP/model"
+          tar -xzf "$RUNNER_TEMP/sentiment-model.tar.gz" -C "$RUNNER_TEMP/model"
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install "transformers>=4.44,<5"
+          python -m pulse_pipeline.score --weights "$RUNNER_TEMP/model" --raw ../data/raw --labels ../data/labels
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Build the 24-hour sentiment snapshot
+        id: snapshot
+        working-directory: pipeline
+        run: python -m pulse_pipeline.snapshot --raw ../data/raw --labels ../data/labels --out ../data/snapshot
+        env:
+          MODEL_API_KEY: ${{ secrets.MUSE_API_KEY }}
+
+      - name: Commit the new files
+        run: bash .github/scripts/commit-data.sh "Collect"
+
+      - name: Deploy the site with the new snapshot
+        if: steps.snapshot.outcome == 'success'
+        run: gh workflow run deploy.yml --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Fail if a source failed
+        if: steps.collect.outputs.status != '0'
+        run: |
+          echo "A collector failed; see the 'Run the collectors' step. The other sources were saved."
+          exit 1

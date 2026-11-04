@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Design tokens. All colors are HSL triplets.
+   Brand: the vermilion of the Pulse mark (#DD390D) on a true neutral near-black. */
+
+@layer base {
+  :root {
+    --background: 0 0% 5.5%; /* #0E0E0E */
+    --foreground: 0 0% 96%; /* #F5F5F5 */
+
+    --card: 0 0% 9%; /* #171717 */
+    --card-foreground: 0 0% 96%;
+
+    --popover: 0 0% 9%;
+    --popover-foreground: 0 0% 96%;
+
+    /* Primary is inverted ink: light fill, dark label. The brand colour is reserved for the one action. */
+    --primary: 0 0% 96%;
+    --primary-foreground: 0 0% 5.5%;
+
+    --secondary: 0 0% 13%; /* #222222 */
+    --secondary-foreground: 0 0% 96%;
+
+    --muted: 0 0% 11%;
+    --muted-foreground: 0 0% 71%; /* #B4B4B4 */
+
+    /* shadcn uses accent for hover fills, so it stays neutral. */
+    --accent: 0 0% 14%;
+    --accent-foreground: 0 0% 96%;
+
+    --brand: 13 89% 46%; /* #DD390D */
+    --brand-foreground: 0 0% 100%;
+
+    --success: 148 50% 50%;
+    --success-foreground: 0 0% 5.5%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 5.5%;
+
+    --destructive: 350 73% 62%;
+    --destructive-foreground: 0 0% 5.5%;
+
+    --border: 0 0% 18%; /* #2E2E2E */
+    --input: 0 0% 25%;
+    --ring: 13 89% 46%;
+
+    --radius: 2px;
+
+    /* The sheared top of a Pulse bar, used to cut buttons. */
+    --bar-cut: polygon(0 8px, 100% 0, 100% 100%, 0 100%);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  ::selection {
+    background: hsl(var(--brand));
+    color: hsl(var(--brand-foreground));
+  }
+}
+
+@layer utilities {
+  .bar-cut {
+    clip-path: var(--bar-cut);
+  }
+
+  .font-display {
+    font-family: "Montserrat", "Inter", system-ui, sans-serif;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* A chat message settling into place. */
+  .message-in {
+    animation: message-in 0.5s ease-out both;
+  }
+
+  @keyframes message-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Four bars rising in turn: the loading state, drawn from the mark. */
+  .bar-loader {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 16px;
+  }
+
+  .bar-loader span {
+    width: 4px;
+    height: 100%;
+    background: hsl(var(--brand));
+    transform-origin: bottom;
+    animation: bar-rise 900ms cubic-bezier(0.16, 1, 0.3, 1) infinite alternate;
+  }
+
+  .bar-loader span:nth-child(2) { animation-delay: 120ms; }
+  .bar-loader span:nth-child(3) { animation-delay: 240ms; }
+  .bar-loader span:nth-child(4) { animation-delay: 360ms; }
+
+  @keyframes bar-rise {
+    from { transform: scaleY(0.35); }
+    to { transform: scaleY(1); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bar-loader span { animation: none; }
+    .message-in { animation: none; }
+  }
+}

@@ -1,0 +1,147 @@
+{
+  "note": "Copied from src/lib/market.ts. Keep the two in step.",
+  "coins": [
+    {
+      "id": "bitcoin",
+      "name": "Bitcoin",
+      "symbol": "BTC"
+    },
+    {
+      "id": "ethereum",
+      "name": "Ethereum",
+      "symbol": "ETH"
+    },
+    {
+      "id": "solana",
+      "name": "Solana",
+      "symbol": "SOL"
+    },
+    {
+      "id": "ripple",
+      "name": "XRP",
+      "symbol": "XRP"
+    },
+    {
+      "id": "binancecoin",
+      "name": "BNB",
+      "symbol": "BNB"
+    },
+    {
+      "id": "dogecoin",
+      "name": "Dogecoin",
+      "symbol": "DOGE"
+    },
+    {
+      "id": "cardano",
+      "name": "Cardano",
+      "symbol": "ADA"
+    },
+    {
+      "id": "tron",
+      "name": "TRON",
+      "symbol": "TRX"
+    },
+    {
+      "id": "hyperliquid",
+      "name": "Hyperliquid",
+      "symbol": "HYPE"
+    },
+    {
+      "id": "monero",
+      "name": "Monero",
+      "symbol": "XMR"
+    },
+    {
+      "id": "chainlink",
+      "name": "Chainlink",
+      "symbol": "LINK"
+    },
+    {
+      "id": "stellar",
+      "name": "Stellar",
+      "symbol": "XLM"
+    },
+    {
+      "id": "bitcoin-cash",
+      "name": "Bitcoin Cash",
+      "symbol": "BCH"
+    },
+    {
+      "id": "near",
+      "name": "NEAR Protocol",
+      "symbol": "NEAR"
+    },
+    {
+      "id": "uniswap",
+      "name": "Uniswap",
+      "symbol": "UNI"
+    },
+    {
+      "id": "litecoin",
+      "name": "Litecoin",
+      "symbol": "LTC"
+    },
+    {
+      "id": "avalanche-2",
+      "name": "Avalanche",
+      "symbol": "AVAX"
+    },
+    {
+      "id": "sui",
+      "name": "Sui",
+      "symbol": "SUI"
+    },
+    {
+      "id": "shiba-inu",
+      "name": "Shiba Inu",
+      "symbol": "SHIB"
+    },
+    {
+      "id": "pepe",
+      "name": "Pepe",
+      "symbol": "PEPE"
+    },
+    {
+      "id": "polkadot",
+      "name": "Polkadot",
+      "symbol": "DOT"
+    },
+    {
+      "id": "arbitrum",
+      "name": "Arbitrum",
+      "symbol": "ARB"
+    },
+    {
+      "id": "polygon-ecosystem-token",
+      "name": "Polygon",
+      "symbol": "POL"
+    },
+    {
+      "id": "aptos",
+      "name": "Aptos",
+      "symbol": "APT"
+    }
+  ],
+  "case_sensitive_names": [
+    "Sui",
+    "Pepe",
+    "Stellar",
+    "Avalanche"
+  ],
+  "any_case_tickers": [
+    "BTC",
+    "ETH",
+    "BNB",
+    "DOGE",
+    "TRX",
+    "XMR",
+    "XLM",
+    "BCH",
+    "LTC",
+    "AVAX",
+    "SHIB"
+  ],
+  "aliases": {
+    "ether": "ethereum"
+  }
+}

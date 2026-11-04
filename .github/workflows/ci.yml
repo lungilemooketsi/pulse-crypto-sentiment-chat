@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches-ignore: [data]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Simulation tests
+        run: node --test scripts/simulate.test.ts scripts/study.test.ts
+
+      - name: Pipeline tests
+        working-directory: pipeline
+        run: python3 -m unittest -v
+
+      - name: Install Worker dependencies
+        run: npm ci --prefix worker
+
+      - name: Typecheck Worker
+        run: npm run typecheck --prefix worker
+
+      - name: Worker tests
+        run: npm test --prefix worker
+
+      - name: Install gitleaks
+        run: |
+          version=8.30.1
+          curl -sSfL "https://github.com/gitleaks/gitleaks/releases/download/v${version}/gitleaks_${version}_linux_x64.tar.gz" -o /tmp/gitleaks.tar.gz
+          tar -xzf /tmp/gitleaks.tar.gz -C /tmp gitleaks
+          sudo install -m 0755 /tmp/gitleaks /usr/local/bin/gitleaks
+          gitleaks version
+
+      - name: Gitleaks scan
+        run: gitleaks detect --source . --config .gitleaks.toml --redact --verbose

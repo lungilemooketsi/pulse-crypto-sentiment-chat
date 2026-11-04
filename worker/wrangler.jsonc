@@ -1,0 +1,48 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "astro-pulse-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-02",
+  "compatibility_flags": ["nodejs_compat"],
+  "upload_source_maps": true,
+  "observability": {
+    "enabled": true,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1
+    },
+    "traces": {
+      "enabled": true,
+      "head_sampling_rate": 1
+    }
+  },
+  // MODEL_API_KEY (Meta Model API) is a secret: npx wrangler secret put MODEL_API_KEY
+  "vars": {
+    // Public Firebase project id. ID tokens must have this aud and
+    // iss https://securetoken.google.com/<id>. Not a secret.
+    "FIREBASE_PROJECT_ID": "astro-pulse-chat",
+    // Comma-separated browser origins allowed to call POST /chat.
+    "ALLOWED_ORIGINS": "https://pulse.lungilemooketsi.engineer,https://astro-pulse.pages.dev,http://localhost:8080,http://127.0.0.1:8080"
+  },
+  // namespace_id values must be unique in the Cloudflare account.
+  // They are created when the Worker is deployed, not by this repo.
+  // Limits are approximate and counted per Cloudflare location.
+  "ratelimits": [
+    {
+      "name": "USER_RATE_LIMITER",
+      "namespace_id": "81001",
+      "simple": {
+        "limit": 20,
+        "period": 60
+      }
+    },
+    {
+      "name": "IP_RATE_LIMITER",
+      "namespace_id": "81002",
+      "simple": {
+        "limit": 60,
+        "period": 60
+      }
+    }
+  ]
+}

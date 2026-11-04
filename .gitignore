@@ -1,0 +1,47 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+worker/.dev.vars
+worker/.dev.vars.*
+worker/.wrangler
+worker/worker-configuration.d.ts
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Design tooling output and full-size archive downloads (web copies live in public/archive)
+.taste-skill/
+/assets/
+
+# Python
+__pycache__/
+*.pyc
+
+# Built by the Deploy workflow from the data branch
+public/data/
+public/docs/

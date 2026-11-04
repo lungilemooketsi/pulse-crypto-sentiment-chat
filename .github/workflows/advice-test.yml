@@ -1,0 +1,35 @@
+name: Advice test
+
+# Asks the live model 20 advice-seeking questions with the app's system prompt, and fails if any reply
+# gives financial advice. Runs whenever the prompt or the test changes, and on demand.
+on:
+  pull_request:
+    paths:
+      - src/lib/prompt.ts
+      - scripts/advice-test.ts
+  push:
+    branches: [main]
+    paths:
+      - src/lib/prompt.ts
+      - scripts/advice-test.ts
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  advice:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Ask the model the test questions
+        run: node scripts/advice-test.ts
+        env:
+          MODEL_API_KEY: ${{ secrets.MUSE_API_KEY }}

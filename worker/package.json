@@ -1,0 +1,17 @@
+{
+  "name": "astro-pulse-api",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "typecheck": "wrangler types && tsc --noEmit",
+    "test": "vitest run",
+    "types": "wrangler types"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vitest": "^4.1.12",
+    "wrangler": "^4.156.1"
+  }
+}

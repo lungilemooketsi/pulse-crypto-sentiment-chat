@@ -1,0 +1,34 @@
+name: Publish model
+
+# Copies the chosen fine-tuned weights from a Train run into a release, where Collect downloads them.
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: The Train run that produced the weights
+        required: true
+      tag:
+        description: Release tag
+        default: sentiment-model-v1
+      model:
+        description: Folder in the weights artifact
+        default: finbert
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Download the weights
+        run: gh run download "${{ inputs.run_id }}" --repo "$GITHUB_REPOSITORY" --name sentiment-weights --dir weights
+
+      - name: Pack the chosen model
+        run: tar -czf sentiment-model.tar.gz -C "weights/${{ inputs.model }}" .
+
+      - name: Publish the release
+        run: gh release create "${{ inputs.tag }}" sentiment-model.tar.gz --repo "$GITHUB_REPOSITORY" --title "Sentiment model ${{ inputs.tag }}" --notes "Fine-tuned ${{ inputs.model }} from Train run ${{ inputs.run_id }}."

@@ -1,0 +1,63 @@
+name: History
+
+# Rebuilds the price history for the Simulation Lab and the Anomaly Library once a day, then deploys.
+# Shares the collect concurrency group because both commit to the data branch.
+on:
+  schedule:
+    - cron: "41 3 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write  # to start a deploy with the new data
+
+concurrency:
+  group: collect
+  cancel-in-progress: false
+
+jobs:
+  history:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check out the data branch into data/
+        run: |
+          git fetch --depth=1 origin data
+          git worktree add -B data data origin/data
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build the price history
+        working-directory: pipeline
+        run: python -m pulse_pipeline.history --out ../data/history
+        env:
+          TWELVE_DATA_API_KEY: ${{ secrets.TWELVE_DATA_API }}
+
+      - name: Find anomalies
+        working-directory: pipeline
+        run: python -m pulse_pipeline.anomalies --history ../data/history/history.json --out ../data/anomalies --max-new 0
+
+      # Saved before categorising, so the Lab and the library have data even if the slow step below fails.
+      - name: Save the history and episodes
+        run: bash .github/scripts/commit-data.sh "History"
+
+      - name: Categorise new episodes
+        continue-on-error: true
+        working-directory: pipeline
+        run: python -m pulse_pipeline.anomalies --history ../data/history/history.json --out ../data/anomalies --max-minutes 35
+        env:
+          MODEL_API_KEY: ${{ secrets.MUSE_API_KEY }}
+
+      - name: Save the categories
+        run: bash .github/scripts/commit-data.sh "Categories"
+
+      - name: Deploy the site with the new data
+        run: gh workflow run deploy.yml --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}

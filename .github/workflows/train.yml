@@ -1,0 +1,85 @@
+name: Train
+
+# Muse Spark labels every collected post, then Pulse's own sentiment model trains on those labels.
+# Started by hand. Shares the collect concurrency group because it commits to the data branch.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: collect
+  cancel-in-progress: false
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check out the data branch into data/
+        run: |
+          git fetch --depth=1 origin data
+          git worktree add -B data data origin/data
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install the packages
+        working-directory: pipeline
+        run: |
+          pip install -r requirements-ml.txt
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install "transformers>=4.44,<5"
+
+      - name: Label every post with Muse Spark
+        continue-on-error: true
+        working-directory: pipeline
+        run: python -m pulse_pipeline.label draft --raw ../data/raw --labels ../data/labels --count 20000
+        env:
+          MODEL_API_KEY: ${{ secrets.MUSE_API_KEY }}
+
+      - name: Save the labels
+        run: bash .github/scripts/commit-data.sh "Labels"
+
+      - name: Train the baselines and TF-IDF
+        working-directory: pipeline
+        run: python -m pulse_pipeline.train classic
+
+      - name: Save the first results
+        run: bash .github/scripts/commit-data.sh "Train"
+
+      - name: Fine-tune DistilRoBERTa
+        continue-on-error: true
+        timeout-minutes: 45
+        working-directory: pipeline
+        run: python -m pulse_pipeline.train transformer --name distilroberta --base distilroberta-base
+
+      - name: Fine-tune FinBERT
+        continue-on-error: true
+        timeout-minutes: 60
+        working-directory: pipeline
+        run: python -m pulse_pipeline.train transformer --name finbert --base ProsusAI/finbert
+
+      - name: Choose on validation
+        working-directory: pipeline
+        run: python -m pulse_pipeline.train pick
+
+      - name: Keep the fine-tuned weights
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sentiment-weights
+          path: data/model/weights
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Save the results
+        run: |
+          rm -rf data/model/weights
+          bash .github/scripts/commit-data.sh "Results"
