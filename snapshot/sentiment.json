@@ -1,0 +1,30 @@
+{
+  "generated_at": "2026-11-05T00:34:13+00:00",
+  "window": {
+    "from": "2026-11-04T00:34:13+00:00",
+    "to": "2026-11-05T00:34:13+00:00"
+  },
+  "method": {
+    "labeller": "Muse Spark (muse-spark-1.3), Meta's model",
+    "labels": "AI-generated following pipeline/LABELLING.md; not yet checked by a human",
+    "sources": "Bluesky posts and crypto news headlines naming the coin, and Finnhub company news for stocks",
+    "min_posts": 5
+  },
+  "coins": {},
+  "model": {
+    "name": "pulse-finbert-v1",
+    "checked": 0,
+    "agreement": null
+  },
+  "fear_greed": {
+    "value": 50,
+    "label": "Neutral",
+    "at": "2026-11-05"
+  },
+  "large_moves": [],
+  "coverage": {
+    "posts_in_window": 622,
+    "labelled": 0,
+    "labelled_this_run": 0
+  }
+}
