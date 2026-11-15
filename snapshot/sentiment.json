@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-11-15T22:48:13+00:00",
+  "generated_at": "2026-11-15T23:32:05+00:00",
   "window": {
-    "from": "2026-11-14T22:48:13+00:00",
-    "to": "2026-11-15T22:48:13+00:00"
+    "from": "2026-11-14T23:32:04+00:00",
+    "to": "2026-11-15T23:32:04+00:00"
   },
   "method": {
     "labeller": "Muse Spark (muse-spark-1.3), Meta's model",
@@ -23,7 +23,7 @@
   },
   "large_moves": [],
   "coverage": {
-    "posts_in_window": 1077,
+    "posts_in_window": 1088,
     "labelled": 0,
     "labelled_this_run": 0
   }
