@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-11-22T20:30:30+00:00",
+  "generated_at": "2026-11-23T01:43:33+00:00",
   "window": {
-    "from": "2026-11-21T20:30:29+00:00",
-    "to": "2026-11-22T20:30:29+00:00"
+    "from": "2026-11-22T01:43:33+00:00",
+    "to": "2026-11-23T01:43:33+00:00"
   },
   "method": {
     "labeller": "Muse Spark (muse-spark-1.3), Meta's model",
@@ -19,11 +19,11 @@
   "fear_greed": {
     "value": 11,
     "label": "Extreme Fear",
-    "at": "2026-11-22"
+    "at": "2026-11-23"
   },
   "large_moves": [],
   "coverage": {
-    "posts_in_window": 975,
+    "posts_in_window": 979,
     "labelled": 0,
     "labelled_this_run": 0
   }
